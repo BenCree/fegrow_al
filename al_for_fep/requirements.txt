@@ -1,0 +1,7 @@
+numpy
+scipy
+scikit-learn
+pandas
+modAL
+absl-py
+rdkit
