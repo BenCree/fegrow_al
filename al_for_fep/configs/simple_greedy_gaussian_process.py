@@ -48,7 +48,7 @@ def get_config():
               'selection_type': 'greedy',
               'hyperparameters': ml_collections.ConfigDict({}),
               'num_elements': 5,
-              'selection_columns': ['Smiles', 'cnnaff_pos', 'id']
+              'selection_columns': ['Smiles', 'cnnaff', 'id']
           }),
       'metadata':
           'Small test for active learning.',
@@ -59,11 +59,11 @@ def get_config():
       'receptor':
       'al_for_fep/data/testdata/rec_final.pdb',
       'training_pool':
-          'al_for_fep/data/testdata/test2.csv',
+          'al_for_fep/data/testdata/initial_training_set_test.csv',
       'virtual_library':
           'al_for_fep/data/testdata/gen.csv',
           'n_sample_mols':
-          20,
+          2,
           'epochs':
           5,
   })

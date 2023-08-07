@@ -130,13 +130,14 @@ def score(smiles_list, core_sdf='core.sdf', protein_filename='rec_final.pdb', nu
     return all_affinities
 
 
-def affinity_to_csv(all_affinities, filename='selection.csv'):
+def affinity_to_csv(all_affinities, filename='al_for_fep/data/testdata/initial_training_set_test.csv'):
     affs = []
 
     for i in range(len(all_affinities)):
         affs.append([all_affinities[i][0].iloc[0]['CNNaffinity'], all_affinities[i][1]])
     df = pd.DataFrame(affs, columns=['cnnaff', 'Smiles'])
     df.to_csv(filename)
+    print(filename)
     return df
 
 
@@ -203,10 +204,20 @@ dG_maxs = []
 dG_means = []
 contains_best = []
 
+
+def generate_training_set(initial_sel, filename):
+	print('generating training set')
+	smiles_list = list(pd.read_csv(initial_sel)['Smiles'])
+	all_affs = score(smiles_list, core_sdf=cycle_config.core_sdf, protein_filename=cycle_config.receptor)
+	affinity_to_csv(all_affs, filename=filename)
+	print(all_affs)
+	print('filename ', filename)
+	
 def main(argv):
     if len(argv) > 1:
         raise app.UsageError('Too many command-line arguments.')
     #i = 0
+    global cycle_config
     cycle_config = _CYCLE_CONFIG.value
     original_cycle_dir = cycle_config.cycle_dir  # Save the original cycle_dir
     print(cycle_config.n_sample_mols)
@@ -221,24 +232,27 @@ def main(argv):
         #     new_dir = f'{original_cycle_dir}_{i}'
         prev_dir = f'{original_cycle_dir}_{i - 1 if i > 0 else 0}'
         cycle_config.cycle_dir = new_dir
-        #i += 1
         os.makedirs(new_dir, exist_ok=True)
-        smiles_list = list(pd.read_csv(cycle_config.training_pool)['Smiles'])
-        #print(smiles_list)
-        print("prevdir, newdir", prev_dir, new_dir)
-        all_affs = score(smiles_list, core_sdf=cycle_config.core_sdf, protein_filename=cycle_config.receptor)
-        #print(all_affs)
-        affinity_to_csv(all_affs, filename=prev_dir + '/selection.csv')
-        cycle_config.training_pool = prev_dir + '/selection.csv'
-        single_cycle_lib.MakitaCycle(cycle_config).run_cycle()
-
-        cycle_config.training_pool = prev_dir + '/selection.csv'
-        cycle_config.virtual_library = prev_dir + '/virtual_library_with_predictions.csv'
-        sel_df = pd.read_csv(new_dir+'/selection.csv')
+        if i == 0:
+            generate_training_set('al_for_fep/data/testdata/smiles.csv', filename='al_for_fep/data/testdata/initial_training_set_test.csv')
+            single_cycle_lib.MakitaCycle(cycle_config).run_cycle()
+            cycle_config.training_pool = prev_dir + '/selection.csv'
+            cycle_config.virtual_library = prev_dir + '/virtual_library_with_predictions.csv'
+        else:
+            single_cycle_lib.MakitaCycle(cycle_config).run_cycle()
+            print('running fegrow and generating training set from : ', prev_dir + '/selection.csv')
+            generate_training_set(prev_dir + '/selection.csv', filename= new_dir + '/selection_cnn.csv')
+            print('writing selection with cnn to ', new_dir)
+            cycle_config.training_pool = new_dir + '/selection_cnn.csv'
+            cycle_config.virtual_library = new_dir + '/virtual_library_with_predictions.csv'
+            print('training pool & virtual library dir for next cycle is : ', new_dir)
+        #sel_df = pd.read_csv(new_dir+'/selection.csv')
         #print(sel_df)
-        dG_means.append(sel_df[feat].astype(float).mean())
-        dG_maxs.append(sel_df[feat].astype(float).max())
+        #dG_means.append(sel_df[feat].astype(float).mean())
+        #dG_maxs.append(sel_df[feat].astype(float).max())
         #contains_best.append(sel_df["id"].values)
+
+
 
 
         #print(prev_dir)

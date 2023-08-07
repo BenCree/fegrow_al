@@ -39,7 +39,7 @@ def get_config():
                   ml_collections.ConfigDict({
                       'feature_type': 'number',
                       'params': {
-                          'feature_column': 'cnnaff',
+                          'feature_column': 'dG',
                       }
                   })
           }),
@@ -47,8 +47,8 @@ def get_config():
           ml_collections.ConfigDict({
               'selection_type': 'greedy',
               'hyperparameters': ml_collections.ConfigDict({}),
-              'num_elements': 5,
-              'selection_columns': ['Smiles', 'cnnaff_pos', 'id']
+              'num_elements': 2,
+              'selection_columns': ['dG', 'Smiles', 'DockingScore']
           }),
       'metadata':
           'Small test for active learning.',
@@ -63,7 +63,7 @@ def get_config():
       'virtual_library':
           'al_for_fep/data/testdata/gen.csv',
           'n_sample_mols':
-          20,
+          2,
           'epochs':
           5,
   })

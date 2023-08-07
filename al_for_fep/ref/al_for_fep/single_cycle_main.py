@@ -205,11 +205,11 @@ def main(argv):
         single_cycle_lib.MakitaCycle(cycle_config).run_cycle()
         cycle_config.training_pool = prev_dir + '/selection.csv'
         cycle_config.virtual_library = prev_dir + '/virtual_library_with_predictions.csv'
-        sel_df = pd.read_csv(new_dir+'/selection.csv')
-        print(sel_df)
-        dG_means.append(sel_df[feat].astype(float).mean())
-        dG_maxs.append(sel_df[feat].astype(float).max())
-        contains_best.append( in sel_df["id"].values)
+        #sel_df = pd.read_csv(new_dir+'/selection.csv')
+        #print(sel_df)
+        #dG_means.append(sel_df[feat].astype(float).mean())
+        #dG_maxs.append(sel_df[feat].astype(float).max())
+        #contains_best.append(sel_df["id"].values)
 
 
         print(prev_dir)
